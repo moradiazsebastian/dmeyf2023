@@ -34,15 +34,15 @@ options(error = function() {
 #  muy pronto esto se leera desde un archivo formato .yaml
 PARAM <- list()
 
-PARAM$experimento <- "E744637_competencia_baseline_lags"
+PARAM$experimento <- "0002_competencia_baseline_lags"
 
-PARAM$input$dataset <- "./datasets/competencia_03.csv.gz"
+PARAM$input$dataset <- "./datasets/competencia_03_lag_delta_8.csv.gz"
 
 # los meses en los que vamos a entrenar
 #  mucha magia emerger de esta eleccion
 PARAM$input$testing <- c(202107)
 PARAM$input$validation <- c(202106)
-PARAM$input$training <- c(201902, 201903, 201904, 201905, 201906, 201907, 201908, 201909, 201910, 201911, 201912, 202001, 202002, 202003, 202004, 202005, 202006, 202007, 202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105)
+PARAM$input$training <- c(201902, 201903, 201904, 201905, 201906, 201907, 201908, 201909, 201910, 201911, 201912, 202001, 202002, 202003, 202004, 202005, 202007, 202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105)
 
 # un undersampling de 0.1  toma solo el 10% de los CONTINUA
 PARAM$trainingstrategy$undersampling <- 1.0
@@ -57,7 +57,7 @@ PARAM$lgb_semilla <- 744637
 
 # Hiperparametros FIJOS de  lightgbm
 PARAM$lgb_basicos <- list(
-  boosting = "gbdt", # puede ir  dart  , ni pruebe random_forest
+  boosting = "dart", # puede ir  dart  , ni pruebe random_forest
   objective = "binary",
   metric = "custom",
   first_metric_only = TRUE,
@@ -65,7 +65,7 @@ PARAM$lgb_basicos <- list(
   feature_pre_filter = FALSE,
   force_row_wise = TRUE, # para reducir warnings
   verbosity = -100,
-  #max_depth = -1L, # -1 significa no limitar,  por ahora lo dejo fijo
+  max_depth = -1L, # -1 significa no limitar,  por ahora lo dejo fijo
   min_gain_to_split = 0.0, # min_gain_to_split >= 0.0
   min_sum_hessian_in_leaf = 0.001, #  min_sum_hessian_in_leaf >= 0.0
   lambda_l1 = 0.0, # lambda_l1 >= 0.0
@@ -94,22 +94,12 @@ PARAM$bo_lgb <- makeParamSet(
   makeNumericParam("learning_rate", lower = 0.02, upper = 0.3),
   makeNumericParam("feature_fraction", lower = 0.01, upper = 1.0),
   makeIntegerParam("num_leaves", lower = 8L, upper = 1024L),
-  makeIntegerParam("min_data_in_leaf", lower = 100L, upper = 50000L),
-  makeIntegerParam("max_depth", lower = 2L, upper = 15L)
-  #makeIntegerParam("bagging_freq", lower = 2L, upper = 20L),
-  #makeNumericParam("neg_bagging_fraction", lower = 0.01, upper = 1.0)
-  #makeNumericParam("scale_pos_weight", lower = 0.01, upper = 1.0)
-  #nuevos parametros (a ser comentados entre baseline y experimento)
-  #makeNumericParam("neg_bagging_fraction", lower = 0.01, upper = 1.0),
-  #makeNumericParam("pos_bagging_fraction", lower = 0.01, upper = 1.0),
-  #akeIntegerParam("bagging_freq", lower = 1, upper = 50),
-  #makeNumericParam("bagging_fraction", lower = 0.01, upper = 1.0)
-  #makeNumericParam("scale_pos_weight", lower = 0.01, upper = 1.0)
+  makeIntegerParam("min_data_in_leaf", lower = 100L, upper = 50000L)
 )
 
 # si usted es ambicioso, y tiene paciencia, podria subir este valor a 100
 PARAM$bo_iteraciones <- 50 # iteraciones de la Optimizacion Bayesiana
-PARAM$input$lags <- 8
+
 #------------------------------------------------------------------------------
 # graba a un archivo los componentes de lista
 # para el primer registro, escribe antes los titulos
@@ -299,10 +289,44 @@ kbayesiana <- paste0(PARAM$experimento, ".RDATA")
 klog <- paste0(PARAM$experimento, ".txt")
 
 
-
 # Catastrophe Analysis  -------------------------------------------------------
 # deben ir cosas de este estilo
 #   dataset[foto_mes == 202006, active_quarter := NA]
+
+# como parte del analisis, se excluye 202006 del set de entrenamiento
+
+# periodo 201905
+dataset[foto_mes == 201905, mrentabilidad := NA]
+dataset[foto_mes == 201905, mrentabilidad_annual := NA]
+dataset[foto_mes == 201905, mcomisiones := NA]
+dataset[foto_mes == 201905, mactivos_margen := NA]
+dataset[foto_mes == 201905, mpasivos_margen := NA]
+dataset[foto_mes == 201905, ccomisiones_otras := NA]
+dataset[foto_mes == 201905, mcomisiones_otras := NA]
+
+# periodo 201910
+dataset[foto_mes == 201910, mrentabilidad := NA]
+dataset[foto_mes == 201910, mrentabilidad_annual := NA]
+dataset[foto_mes == 201910, mactivos_margen := NA]
+dataset[foto_mes == 201910, mpasivos_margen := NA]
+dataset[foto_mes == 201910, ccomisiones_otras := NA]
+dataset[foto_mes == 201910, mcomisiones_otras := NA]
+dataset[foto_mes == 201910, chomebanking_transacciones := NA]
+dataset[foto_mes == 201910, ccomisiones_otras := NA]
+
+# periodo 201904
+dataset[foto_mes == 201904, ctarjeta_visa_debitos_automaticos := NA]
+dataset[foto_mes == 201904, mttarjeta_visa_debitos_automaticos := NA]
+
+# periodo 201907
+dataset[foto_mes == 201907, Master_fultimo_cierre := NA]
+
+# periodo 202009
+dataset[foto_mes == 202009, Master_fultimo_cierre := NA]
+
+# periodo 202106
+dataset[foto_mes == 201904, Master_fultimo_cierre := NA]
+
 
 # Data Drifting
 # por ahora, no hago nada
@@ -311,36 +335,6 @@ klog <- paste0(PARAM$experimento, ".txt")
 # Feature Engineering Historico  ----------------------------------------------
 #   aqui deben calcularse los  lags y  lag_delta
 #   Sin lags no hay paraiso !  corta la bocha
-
-# calculo de lags
-calcular_lags <- function(dt, columnas, cantidad) {
-  for(columna in columnas){
-    i <- 0
-    while(i<cantidad){
-      i <- i+1
-      
-      lag <- paste0(columna,"_lag_", i)
-      delta <- paste0(columna,"_lag_delta_", i)
-
-      cat("\nProcesando columna:",columna)
-      
-      scolumna <- sym(columna)
-      slag <- sym(lag)
-      sdelta <- sym(delta)
-      
-      #generacion de lags y lags delta
-      dt[, (lag) := shift(eval(scolumna),  n=i, fill=NA, type="lag")]
-      dt[, (delta) := eval(scolumna)-eval(slag)]
-    }
-  }
-  return(dt)
-}
-
-# columnas objetivo
-target = c("ctrx_quarter", "mpasivos_margen", "mautoservicio" , "ctarjeta_debito_transacciones" , "mtransferencias_emitidas" , "ctransferencias_emitidas" , "mpayroll" , "cpayroll_trx", "mcomisiones_mantenimiento", "mcomisiones_otras", "mcomisiones", "mcaja_ahorro", "mcuentas_saldo", "mtarjeta_visa_consumo","mprestamos_personales")
-
-# calculando lags
-dataset <- calcular_lags(dataset, target, PARAM$input$lags)
 
 # ahora SI comienza la optimizacion Bayesiana
 

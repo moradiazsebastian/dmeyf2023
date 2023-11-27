@@ -464,11 +464,11 @@ surr.km <- makeLearner(
 )
 
 # inicio la optimizacion bayesiana
-# if (!file.exists(kbayesiana)) {
-#   run <- mbo(obj.fun, learner = surr.km, control = ctrl)
-# } else {
-#   run <- mboContinue(kbayesiana) # retomo en caso que ya exista
-# }
-run <- mbo(obj.fun, learner = surr.km, control = ctrl)
+if (!file.exists(kbayesiana)) {
+  run <- mbo(obj.fun, learner = surr.km, control = ctrl)
+} else {
+  run <- mboContinue(kbayesiana) # retomo en caso que ya exista
+}
+
 
 cat("\n\nLa optimizacion Bayesiana ha terminado\n")

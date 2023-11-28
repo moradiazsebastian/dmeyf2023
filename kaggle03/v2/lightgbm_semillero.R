@@ -59,12 +59,12 @@ PARAM$finalmodel$lgb_basicos <- list(
 )
 
 # hiperparametros optimos
-PARAM$finalmodel$optim$num_iterations <- 573
-PARAM$finalmodel$optim$learning_rate <- 0.163268751686726
-PARAM$finalmodel$optim$feature_fraction <- 0.114998502217568
-PARAM$finalmodel$optim$min_data_in_leaf <- 45959
-PARAM$finalmodel$optim$num_leaves <- 818
-PARAM$finalmodel$optim$top_rate <- 0.408796342237827
+PARAM$finalmodel$optim$num_iterations <- 9000
+PARAM$finalmodel$optim$learning_rate <- 0.0910065976316109
+PARAM$finalmodel$optim$feature_fraction <- 0.503295995982364
+PARAM$finalmodel$optim$feature_fraction_bynode <- 0.651194636118249
+PARAM$finalmodel$optim$min_data_in_leaf <- 16382
+PARAM$finalmodel$optim$num_leaves <- 453
 #PARAM$finalmodel$optim$bagging_freq <- 8
 #PARAM$finalmodel$optim$neg_bagging_fraction <- 0.461 
 

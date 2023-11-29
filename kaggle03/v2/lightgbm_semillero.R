@@ -9,8 +9,6 @@ gc() # garbage collection
 
 require("data.table")
 require("lightgbm")
-require("dplyr")
-require("rlang")
 
 
 # defino los parametros de la corrida, en una lista, la variable global  PARAM
@@ -59,7 +57,7 @@ PARAM$finalmodel$lgb_basicos <- list(
   #  seed = PARAM$finalmodel$semilla
 )
 # hiperparametros optimos
-PARAM$finalmodel$optim$num_iterations <- 1500
+PARAM$finalmodel$optim$num_iterations <- 860
 PARAM$finalmodel$optim$learning_rate <- 0.0845
 PARAM$finalmodel$optim$feature_fraction <- 0.29
 PARAM$finalmodel$optim$min_data_in_leaf <- 6658

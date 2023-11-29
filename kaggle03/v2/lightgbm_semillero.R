@@ -23,12 +23,13 @@ PARAM$input$semillas <- sample(10000:100000, 20, replace = FALSE)
 #excluyendo 202006
 #PARAM$input$training <- c(201902, 201903, 201904, 201905, 201906, 201907, 201908, 201909, 201910, 201911, 201912, 202001, 202002, 202003, 202004, 202005, 202007, 202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105, 202106, 202107)
 #despues probar ccomo se debe, excluyendo 202106 y 202107
-PARAM$input$training <- c(202001, 202002, 202003, 202004, 202005, 202007, 202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105, 202106, 202107)
+PARAM$input$training <- c(202011, 202012, 202101, 202102, 202103, 202104, 202105, 202106, 202107)
 PARAM$input$future <- c(202109) # meses donde se aplica el modelo
-PARAM$input$cuarentena <- c(202003,202004,202005,202006,202007,202008)
+
+
 
 # PARAM$finalmodel$semilla <- 288913
-PARAM$experimento <- "semillero_competencia_baseline_lags_4_goss"
+PARAM$experimento <- "0009_semillero_competencia_baseline_lags_4_goss"
 
 # Hiperparametros FIJOS de  lightgbm
 PARAM$finalmodel$lgb_basicos <- list(
@@ -57,14 +58,14 @@ PARAM$finalmodel$lgb_basicos <- list(
   extra_trees = TRUE # Magic Sauce
   #  seed = PARAM$finalmodel$semilla
 )
-
 # hiperparametros optimos
-PARAM$finalmodel$optim$num_iterations <- 9000
-PARAM$finalmodel$optim$learning_rate <- 0.0910065976316109
-PARAM$finalmodel$optim$feature_fraction <- 0.503295995982364
-PARAM$finalmodel$optim$feature_fraction_bynode <- 0.651194636118249
-PARAM$finalmodel$optim$min_data_in_leaf <- 16382
-PARAM$finalmodel$optim$num_leaves <- 453
+PARAM$finalmodel$optim$num_iterations <- 1500
+PARAM$finalmodel$optim$learning_rate <- 0.0845
+PARAM$finalmodel$optim$feature_fraction <- 0.29
+PARAM$finalmodel$optim$min_data_in_leaf <- 6658
+PARAM$finalmodel$optim$num_leaves <- 676
+PARAM$finalmodel$optim$top_rate <- 0.273
+PARAM$finalmodel$optim$other_rate <- 0.232
 #PARAM$finalmodel$optim$bagging_freq <- 8
 #PARAM$finalmodel$optim$neg_bagging_fraction <- 0.461 
 
@@ -132,17 +133,13 @@ dataset[foto_mes %in% PARAM$input$training, train := 1L]
 # se trabaja con la clase  POS = { BAJA+1, BAJA+2 }
 # esta estrategia es MUY importante
 dataset[, clase01 := ifelse(clase_ternaria %in% c("BAJA+2", "BAJA+1"), 1L, 0L)]
-dataset[, cuarentena := 0L]
-dataset[foto_mes %in% PARAM$input$cuarentena, cuarentena := 1L]
 
 #--------------------------------------
 
 # los campos que se van a utilizar
 columnas_excluir <- c(
   "clase_ternaria", 
-  "clase01",
-  "Master_fultimo_cierre",
-  "Visa_fultimo_cierre"
+  "clase01"
 )
 campos_buenos <- setdiff(colnames(dataset), columnas_excluir)
 
@@ -258,7 +255,7 @@ for(ksemilla in PARAM$input$semillas){
       semilla = ksemilla,
       envios = envios,
       ganancia = PARAM$NEG_ganancia*nrow(tb_entrega[Predicted==1 & clase_ternaria!="BAJA+2"]) + PARAM$POS_ganancia*nrow(tb_entrega[Predicted==1 & clase_ternaria=="BAJA+2"])
-      )
+    )
     
     #acumulamos las ganancias de todos los envios en un solo data table
     ganancia_semilla <- rbind(ganancia_semilla, ganancia_envios)

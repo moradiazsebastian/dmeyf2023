@@ -4,7 +4,7 @@ rm(list = ls()) # remove all objects
 gc() # garbage collection
 
 PARAM <- list()
-PARAM$experimento <- "semillero_competencia_baseline_lags_4_goss"
+PARAM$experimento <- "0009_semillero_competencia_baseline_lags_4_goss"
 PARAM$input$dataset <- "./datasets/competencia_03_lag_delta_4.csv.gz"
 PARAM$input$prediccion <- "prediccion.txt"
 PARAM$input$ganancias <- "ganancias.csv"

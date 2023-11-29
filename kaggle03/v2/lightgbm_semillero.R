@@ -137,7 +137,9 @@ dataset[, clase01 := ifelse(clase_ternaria %in% c("BAJA+2", "BAJA+1"), 1L, 0L)]
 # los campos que se van a utilizar
 columnas_excluir <- c(
   "clase_ternaria", 
-  "clase01"
+  "clase01",
+  "foto_ano",
+  "foto_mes"
 )
 campos_buenos <- setdiff(colnames(dataset), columnas_excluir)
 

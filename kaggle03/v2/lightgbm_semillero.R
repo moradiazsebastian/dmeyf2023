@@ -14,7 +14,7 @@ require("lightgbm")
 # defino los parametros de la corrida, en una lista, la variable global  PARAM
 #  muy pronto esto se leera desde un archivo formato .yaml
 PARAM <- list()
-PARAM$input$dataset <- "./datasets/competencia_03_lag_delta_4.csv.gz"
+PARAM$input$dataset <- "./datasets/competencia_03_lag_delta_2.csv.gz"
 set.seed(42)
 PARAM$input$semillas <- sample(10000:100000, 20, replace = FALSE)
 
@@ -27,7 +27,7 @@ PARAM$input$future <- c(202109) # meses donde se aplica el modelo
 
 
 # PARAM$finalmodel$semilla <- 288913
-PARAM$experimento <- "0009_semillero_competencia_baseline_lags_4_goss"
+PARAM$experimento <- "0010_semillero_competencia_baseline_lags_4_goss"
 
 # Hiperparametros FIJOS de  lightgbm
 PARAM$finalmodel$lgb_basicos <- list(
@@ -197,12 +197,16 @@ for(ksemilla in PARAM$input$semillas){
     param = param_completo,
   )  
   
+  cat("\nCreando directorio.")
+  
   # Establezco el Working Directory DEL EXPERIMENTO
   dir.create(paste0(ksemilla,"/"), showWarnings = FALSE)
   setwd(paste0(ksemilla))
   
   #--------------------------------------
   # ahora imprimo la importancia de variables
+  cat("\nImportancia de variables.\n")
+  
   tb_importancia <- as.data.table(lgb.importance(modelo))
   archivo_importancia <- "impo.txt"
   
@@ -212,6 +216,7 @@ for(ksemilla in PARAM$input$semillas){
   )
   
   #--------------------------------------
+  cat("\nPrediciendo.\n")
   
   # aplico el modelo a los datos nuevos
   prediccion <- predict(
@@ -238,6 +243,7 @@ for(ksemilla in PARAM$input$semillas){
   # si la palabra inteligentemente no le significa nada aun
   # suba TODOS los archivos a Kaggle
   # espera a la siguiente clase sincronica en donde el tema sera explicado
+  cat("\nCalculando ganancia y envios.\n")
   
   cortes <- seq(8000, 18000, by = 50)
   ganancia_semilla <- data.table()
